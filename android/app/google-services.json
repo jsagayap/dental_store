@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "247177348756",
+    "project_id": "dental-store-999e7",
+    "storage_bucket": "dental-store-999e7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:247177348756:android:c17558196dfecb53679681",
+        "android_client_info": {
+          "package_name": "com.example.dental_store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "247177348756-9qkhkdn3k5if8uq2u9r74njsi7pmkjvo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyTNjOojb7dNC_9pkT3MnQk1eo6xuCkig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "247177348756-9qkhkdn3k5if8uq2u9r74njsi7pmkjvo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
