@@ -26,7 +26,9 @@ class CartScreen extends StatelessWidget {
               height: 110,
               padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 24),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, '/checkout');
+                },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(99.0),

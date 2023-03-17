@@ -1,5 +1,7 @@
+import 'package:dental_store/blocs/checkout/checkout_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:dental_store/widgets/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CheckoutScreen extends StatelessWidget {
   static const String routeName = '/checkout';
@@ -14,11 +16,6 @@ class CheckoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController addressController = TextEditingController();
-    final TextEditingController cityController = TextEditingController();
-    final TextEditingController countryController = TextEditingController();
-    final TextEditingController zipCodeController = TextEditingController();
-
     return Scaffold(
       appBar: const CustomAppBar(title: 'Checkout'),
       bottomNavigationBar: BottomAppBar(
@@ -27,49 +24,97 @@ class CheckoutScreen extends StatelessWidget {
         child: Container(
             height: 110,
             padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 24),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(99.0),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.credit_card_outlined,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Place Order',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.normal,
+            child: BlocBuilder<CheckoutBloc, CheckoutState>(
+              builder: (context, state) {
+                if (state is CheckoutLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (state is CheckoutLoaded) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      context
+                      .read<CheckoutBloc>()
+                      .add(ConfirmCheckout(checkout: state.checkout));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(99.0),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.credit_card_outlined,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Place Order',
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                else {
+                  return const Text('Something went wrong');
+                }
+              },
             )),
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Delivery Information',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              _buildTextFormField(addressController, context, 'Address'),
-              _buildTextFormField(cityController, context, 'City'),
-              _buildTextFormField(countryController, context, 'Country'),
-              _buildTextFormField(zipCodeController, context, 'ZIP Code'),
-              const SizedBox(height: 16),
-              const OrderSummary(),
-            ],
+          child: BlocBuilder<CheckoutBloc, CheckoutState>(
+            builder: (context, state) {
+              if (state is CheckoutLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (state is CheckoutLoaded) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Delivery Information',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    _buildTextFormField((value) {
+                      context
+                          .read<CheckoutBloc>()
+                          .add(UpdateCheckout(address: value));
+                    }, context, 'Address'),
+                    _buildTextFormField((value) {
+                      context
+                          .read<CheckoutBloc>()
+                          .add(UpdateCheckout(city: value));
+                    }, context, 'City'),
+                    _buildTextFormField((value) {
+                      context
+                          .read<CheckoutBloc>()
+                          .add(UpdateCheckout(country: value));
+                    }, context, 'Country'),
+                    _buildTextFormField((value) {
+                      context
+                          .read<CheckoutBloc>()
+                          .add(UpdateCheckout(zipCode: value));
+                    }, context, 'ZIP Code'),
+                    const SizedBox(height: 16),
+                    const OrderSummary(),
+                  ],
+                );
+              } else {
+                return const Text('Something went wrong');
+              }
+            },
           ),
         ),
       ),
@@ -77,7 +122,7 @@ class CheckoutScreen extends StatelessWidget {
   }
 
   Row _buildTextFormField(
-    TextEditingController controller,
+    Function(String)? onChanged,
     BuildContext context,
     String labelText,
   ) {
@@ -92,13 +137,11 @@ class CheckoutScreen extends StatelessWidget {
         ),
         Expanded(
           child: TextFormField(
-            controller: controller,
+            onChanged: onChanged,
             decoration: const InputDecoration(
               isDense: true,
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.black
-                ),
+                borderSide: BorderSide(color: Colors.black),
               ),
             ),
           ),

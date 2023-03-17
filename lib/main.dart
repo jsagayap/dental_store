@@ -1,6 +1,8 @@
 import 'package:dental_store/blocs/cart/cart_bloc.dart';
+import 'package:dental_store/blocs/checkout/checkout_bloc.dart';
 import 'package:dental_store/config/app_router.dart';
 import 'package:dental_store/repositories/category/category_repository.dart';
+import 'package:dental_store/repositories/checkout/checkout_repository.dart';
 import 'package:dental_store/repositories/product/product_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,12 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => CartBloc()..add(CartStarted())),
         BlocProvider(
+          create: (context) => CheckoutBloc(
+            cartBloc: context.read<CartBloc>(),
+            checkoutRepository: CheckoutRepository(),
+          ),
+        ),
+        BlocProvider(
           create: (_) => CategoryBloc(
             categoryRepository: CategoryRepository(),
           )..add(LoadCategories()),
@@ -39,7 +47,7 @@ class MyApp extends StatelessWidget {
         title: 'Dental Store',
         theme: theme(),
         onGenerateRoute: AppRouter.onGenerateRoute,
-        initialRoute: CheckoutScreen.routeName,
+        initialRoute: HomeScreen.routeName,
       ),
     );
   }
