@@ -12,11 +12,7 @@ import 'package:dental_store/repositories/product/product_repository.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-  // ignore: deprecated_member_use
-  BlocOverrides.runZoned(() {
-    runApp(const MyApp());
-  });
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
