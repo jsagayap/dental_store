@@ -20,19 +20,4 @@ class Category extends Equatable {
     );
     return category;
   }
-
-  static List<Category> categories = [
-    const Category(
-      name: 'Dental Floss',
-      imageUrl: 'test',
-    ),
-    const Category(
-      name: 'Toothpaste',
-      imageUrl: 'test',
-    ),
-    const Category(
-      name: 'Toothbrush',
-      imageUrl: 'test',
-    ),
-  ];
 }
