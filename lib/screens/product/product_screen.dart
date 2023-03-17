@@ -35,7 +35,7 @@ class ProductScreen extends StatelessWidget {
               builder: (context, state) {
                 return ElevatedButton(
                   onPressed: () {
-                    context.read<CartBloc>().add(CartProductAdded(product));
+                    context.read<CartBloc>().add(AddProduct(product));
                     Navigator.pushNamed(context, '/cart');
                   },
                   style: ElevatedButton.styleFrom(

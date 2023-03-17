@@ -1,16 +1,13 @@
-import 'package:dental_store/blocs/cart/cart_bloc.dart';
-import 'package:dental_store/blocs/checkout/checkout_bloc.dart';
+import 'package:flutter/material.dart';
+import 'config/theme.dart';
+import 'screens/screens.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:dental_store/config/app_router.dart';
+import 'package:dental_store/blocs/blocs.dart';
 import 'package:dental_store/repositories/category/category_repository.dart';
 import 'package:dental_store/repositories/checkout/checkout_repository.dart';
 import 'package:dental_store/repositories/product/product_repository.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'blocs/category/category_bloc.dart';
-import 'blocs/product/product_bloc.dart';
-import 'config/theme.dart';
-import 'screens/screens.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => CartBloc()..add(CartStarted())),
+        BlocProvider(create: (_) => CartBloc()..add(LoadCart())),
         BlocProvider(
           create: (context) => CheckoutBloc(
             cartBloc: context.read<CartBloc>(),
