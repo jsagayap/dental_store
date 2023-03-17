@@ -91,7 +91,7 @@ class ProductScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sit corporis tempore error voluptate facilis consequatur ea. Fuga illo nisi quo asperiores debitis. Quod enim iure laboriosam eligendi. Minima mollitia eius maiores asperiores animi et enim.',
+                  product.description,
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ],
