@@ -14,8 +14,6 @@ class CheckoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController nameController = TextEditingController();
     final TextEditingController addressController = TextEditingController();
     final TextEditingController cityController = TextEditingController();
     final TextEditingController countryController = TextEditingController();
@@ -23,19 +21,44 @@ class CheckoutScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: const CustomAppBar(title: 'Checkout'),
+      bottomNavigationBar: BottomAppBar(
+        color: const Color.fromARGB(0, 0, 0, 0),
+        elevation: 0.0,
+        child: Container(
+            height: 110,
+            padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 24),
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(99.0),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.credit_card_outlined,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Place Order',
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            )),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Customer Information',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              _buildTextFormField(emailController, context, 'Email'),
-              _buildTextFormField(nameController, context, 'Full name'),
-              const SizedBox(height: 16),
               Text(
                 'Delivery Information',
                 style: Theme.of(context).textTheme.titleMedium,
