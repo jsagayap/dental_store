@@ -1,16 +1,23 @@
-import 'package:dental_store/blocs/cart/cart_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/models.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:dental_store/services/firebase_services.dart';
 
 class CartProductCard extends StatelessWidget {
   const CartProductCard({
     Key? key,
-    required this.product,
+    required this.id,
+    required this.name,
+    required this.category,
+    required this.imageUrl,
+    required this.price,
     required this.quantity,
   }) : super(key: key);
 
-  final Product product;
+  final dynamic id;
+  final String name;
+  final String category;
+  final String imageUrl;
+  final int price;
   final int quantity;
 
   @override
@@ -29,34 +36,36 @@ class CartProductCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
         child: Row(
           children: [
             Image.network(
-              product.imageUrl,
+              imageUrl,
               width: 60,
               height: 60,
               fit: BoxFit.fitHeight,
             ),
-            const SizedBox(width: 24),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    name,
+                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
-                    'PHP ${product.price}',
+                    'PHP $price',
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                           color: const Color(0xff51a8ff),
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   Text(
-                    product.category,
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    category,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: const Color(0xff5e6177),
                         ),
                   ),
@@ -64,63 +73,66 @@ class CartProductCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            BlocBuilder<CartBloc, CartState>(
-              builder: (context, state) {
-                return Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color.fromRGBO(178, 178, 178, .2),
-                            blurRadius: 30,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
+            Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15.0),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color.fromRGBO(178, 178, 178, .2),
+                        blurRadius: 30,
+                        offset: Offset(0, 5),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: IconButton(
-                          icon: const Icon(Icons.chevron_left_outlined),
-                          onPressed: () {
-                            context.read<CartBloc>().add(RemoveProduct(product));
-                          },
-                        ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(IconlyBroken.arrowLeft2),
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          FirestoreServices.removeItemQuantity(id, quantity);
+                        },
                       ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    '$quantity',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(width: 16),
-                    Text(
-                      '$quantity',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(width: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color.fromRGBO(178, 178, 178, .2),
-                            blurRadius: 30,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15.0),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color.fromRGBO(178, 178, 178, .2),
+                        blurRadius: 30,
+                        offset: Offset(0, 5),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: IconButton(
-                          icon: const Icon(Icons.chevron_right_outlined),
-                          onPressed: () {
-                            context.read<CartBloc>().add(AddProduct(product));
-                          },
-                        ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(IconlyBroken.arrowRight2),
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          FirestoreServices.addItemQuantity(id, quantity);
+                        },
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -1,92 +1,120 @@
-import 'package:dental_store/blocs/product/product_bloc.dart';
-import 'package:dental_store/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:get/get.dart';
+import 'package:dental_store/widgets/widgets.dart';
+import 'package:dental_store/screens/screens.dart';
+import 'package:dental_store/controllers/home_controller.dart';
+import 'package:dental_store/services/firebase_services.dart';
 
 class HomeScreen extends StatelessWidget {
-  static const String routeName = '/';
-
   const HomeScreen({Key? key}) : super(key: key);
-
-  static Route route() {
-    return MaterialPageRoute(
-      settings: const RouteSettings(name: routeName),
-      builder: (_) => const HomeScreen(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
+    var controller = Get.put(HomeController());
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Dental Store'),
+      appBar: const CustomAppBar(title: 'Dental Store', backButton: false),
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Container(
+              height: 48,
+              margin: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.only(left: 24.0, right: 8.0, top: 4.0, bottom: 4.0),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(9999.0),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(178, 178, 178, .2),
+                    blurRadius: 30,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: TextFormField(
+                controller: controller.searchController,
+                textAlignVertical: TextAlignVertical.center,
+                decoration: InputDecoration(
+                  hintStyle: const TextStyle(
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xff5e6177),
+                  ),
+                  hintText: 'Search products',
+                  fillColor: Colors.white,
+                  filled: true,
+                  border: InputBorder.none,
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.transparent,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 11),
+                  alignLabelWithHint: true,
+                  suffixIcon: IconButton(
+                    icon: const Icon(IconlyBroken.search),
+                    onPressed: () {
+                      if (controller.searchController.text.isNotEmpty) {
+                        Get.to(() => SearchScreen(title: controller.searchController.text));
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ),
             const SectionTitle(title: 'Dental Floss'),
-            BlocBuilder<ProductBloc, ProductState>(
-              builder: (context, state) {
-                if (state is ProductLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                if (state is ProductLoaded) {
-                  return ProductCarousel(
-                      products: state.products
-                          .where((product) => product.category == 'Dental Floss')
-                          .toList());
-                }
-                else {
-                  return const Text('Something went wrong.');
-                }
-              },
-            ),
+            const ProductCarousel(category: 'Dental Floss'),
             const SectionTitle(title: 'Toothbrush'),
-            BlocBuilder<ProductBloc, ProductState>(
-              builder: (context, state) {
-                if (state is ProductLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                if (state is ProductLoaded) {
-                  return ProductCarousel(
-                      products: state.products
-                          .where((product) => product.category == 'Toothbrush')
-                          .toList());
-                }
-                else {
-                  return const Text('Something went wrong.');
-                }
-              },
-            ),
+            const ProductCarousel(category: 'Toothbrush'),
             const SectionTitle(title: 'Toothpaste'),
-            BlocBuilder<ProductBloc, ProductState>(
-              builder: (context, state) {
-                if (state is ProductLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                if (state is ProductLoaded) {
-                  return ProductCarousel(
-                      products: state.products
-                          .where((product) => product.category == 'Toothpaste')
-                          .toList());
-                }
-                else {
-                  return const Text('Something went wrong.');
-                }
-              },
-            ),
+            const ProductCarousel(category: 'Toothpaste'),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/cart');
-        },
-        child: const Icon(Icons.shopping_cart_outlined),
+      floatingActionButton: FittedBox(
+        child: FutureBuilder(
+          // TODO: Change 1 to the logged user's ID
+          future: FirestoreServices.getCartCount(1),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            // var count = snapshot.data;
+
+            return Stack(
+              alignment: const Alignment(1.4, -1.5),
+              children: [
+                FloatingActionButton(  // Your actual Fab
+                  onPressed: () {
+                    Get.to(() => const CartScreen());
+                  },
+                  backgroundColor: const Color(0xFF51A8FF),
+                  child: const Icon(IconlyBroken.buy),
+                ),
+                // Container(
+                //   padding: const EdgeInsets.all(4),
+                //   constraints: const BoxConstraints(minHeight: 28, minWidth: 28),
+                //   decoration: BoxDecoration(
+                //     boxShadow: [
+                //       BoxShadow(
+                //         spreadRadius: 1,
+                //         blurRadius: 16,
+                //         color: Colors.black.withAlpha(50)
+                //       ),
+                //     ],
+                //     borderRadius: BorderRadius.circular(16),
+                //     color: Colors.red,
+                //   ),
+                //   child: Center(
+                //     child: Text(
+                //       count.toString(),
+                //       style: const TextStyle(color: Colors.white)
+                //     ),
+                //   ),
+                // ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

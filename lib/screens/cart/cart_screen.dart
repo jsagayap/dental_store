@@ -1,118 +1,91 @@
-import 'package:dental_store/blocs/cart/cart_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dental_store/widgets/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dental_store/screens/screens.dart';
+import 'package:dental_store/services/firebase_services.dart';
+import 'package:dental_store/controllers/cart_controller.dart';
 
 class CartScreen extends StatelessWidget {
-  static const String routeName = '/cart';
-
   const CartScreen({Key? key}) : super(key: key);
-
-  static Route route() {
-    return MaterialPageRoute(
-      settings: const RouteSettings(name: routeName),
-      builder: (_) => const CartScreen(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: const CustomAppBar(title: 'Cart'),
-        bottomNavigationBar: BottomAppBar(
-          color: const Color.fromARGB(0, 0, 0, 0),
-          elevation: 0.0,
-          child: Container(
-              height: 110,
-              padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 24),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/checkout');
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(99.0),
+    var controller = Get.put(CartController());
+
+    return StreamBuilder(
+      // TODO: Change 1 to the logged user's ID
+      stream: FirestoreServices.getCart(1),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            appBar: CustomAppBar(title: 'Cart', backButton: true),
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        else if (snapshot.data!.docs.isEmpty) {
+          return Scaffold(
+            appBar: const CustomAppBar(title: 'Cart', backButton: true),
+            body: Align(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    IconlyBroken.buy,
+                    size: 48.0,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.credit_card_outlined,
+                  SizedBox(height: 16),
+                  Text('Cart is empty'),
+                ],
+              ),
+            ),
+          );
+        }
+        else {
+          var data = snapshot.data!.docs;
+          controller.calculate(data);
+          controller.productSnapshot = data;
+
+          return Scaffold(
+            appBar: const CustomAppBar(title: 'Cart', backButton: true),
+            bottomNavigationBar: CustomNavBar(
+              title: 'Proceed to Shipping',
+              icon: const Icon(IconlyBroken.paper),
+              action: () {
+                Get.to(() => const ShippingScreen());
+              },
+            ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (context, int index) {
+                        return CartProductCard(
+                          id: data[index].id,
+                          name: data[index]['name'],
+                          category: data[index]['category'],
+                          imageUrl: data[index]['imageUrl'],
+                          price: data[index]['price'],
+                          quantity: data[index]['quantity'],
+                        );
+                      }
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Proceed to Payment',
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-        ),
-        body: BlocBuilder<CartBloc, CartState>(
-          builder: (context, state) {
-            if (state is CartLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (state is CartLoaded) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          state.cart.freeDeliveryString,
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/');
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(99.0),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            'Add more',
-                            style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: state.cart.productQuantity(state.cart.products).keys.length,
-                        itemBuilder: (context, index) {
-                          return CartProductCard(
-                            product: state.cart.productQuantity(state.cart.products).keys.elementAt(index),
-                            quantity: state.cart.productQuantity(state.cart.products).values.elementAt(index),
-                          );
-                        }
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const OrderSummary(),
-                  ],
-                ),
-              );
-            }
-            else {
-              return const Text('Something went wrong');
-            }
-          },
-        ));
+                  ),
+                  const SizedBox(height: 16),
+                  const OrderSummary(),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+    );
   }
 }

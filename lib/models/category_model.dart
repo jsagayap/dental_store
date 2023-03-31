@@ -1,23 +1,27 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:equatable/equatable.dart';
+import 'dart:convert';
 
-class Category extends Equatable {
-  final String name;
-  final String imageUrl;
+CategoryModel categoryModelFromJson(String str) => CategoryModel.fromJson(json.decode(str));
 
-  const Category({
-    required this.name,
-    required this.imageUrl,
+class CategoryModel {
+  CategoryModel({
+    required this.categories,
   });
 
-  @override
-  List<Object?> get props => [name, imageUrl];
+  List<Category> categories;
 
-  static Category fromSnapshot(DocumentSnapshot snap) {
-    Category category = Category(
-      name: snap['name'],
-      imageUrl: snap['imageUrl'],
-    );
-    return category;
-  }
+  factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
+    categories: List<Category>.from(json["categories"].map((x) => Category.fromJson(x))),
+  );
+}
+
+class Category {
+  Category({
+    required this.name,
+  });
+
+  String name;
+
+  factory Category.fromJson(Map<String, dynamic> json) => Category(
+    name: json["name"],
+  );
 }

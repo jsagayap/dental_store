@@ -1,19 +1,23 @@
-import 'package:dental_store/models/product_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dental_store/screens/screens.dart';
 
 class ProductCard extends StatelessWidget {
-  final Product product;
+  final QueryDocumentSnapshot<Object?> product;
+  final double widthFactor;
 
   const ProductCard({
     Key? key,
     required this.product,
+    required this.widthFactor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/product', arguments: product);
+        Get.to(() => ProductScreen(title: product['name'], data: product));
       },
       child: Container(
         clipBehavior: Clip.hardEdge,
@@ -31,21 +35,22 @@ class ProductCard extends StatelessWidget {
           children: [
             Expanded(
               child: Container(
-                width: MediaQuery.of(context).size.width / 3,
-                height: 250,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  image: DecorationImage(
-                    fit: BoxFit.fitWidth,
+                width: MediaQuery.of(context).size.width / widthFactor,
+                height: 220,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Image(
+                    fit: BoxFit.fitHeight,
                     image: NetworkImage(
-                      product.imageUrl,
+                      product['imageUrl'],
                     ),
                   ),
                 ),
               ),
             ),
             Container(
-              width: MediaQuery.of(context).size.width / 3,
+              width: MediaQuery.of(context).size.width / widthFactor,
               height: 70,
               decoration: const BoxDecoration(
                 color: Colors.white,
@@ -59,12 +64,12 @@ class ProductCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          product.name,
+                          product['name'],
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Text(
-                          'PHP ${product.price}',
-                          style: Theme.of(context).textTheme.titleSmall,
+                          'PHP ${product['price']}',
+                          style: Theme.of(context).textTheme.titleSmall!.copyWith(color: const Color(0xff5e6177)),
                         ),
                       ],
                     ),

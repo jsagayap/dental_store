@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:dental_store/models/product_model.dart';
-import 'product_card.dart';
+import 'package:dental_store/widgets/widgets.dart';
+import 'package:dental_store/services/firebase_services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductCarousel extends StatelessWidget {
-  final List<Product> products;
+  final String category;
 
   const ProductCarousel({
     Key? key,
-    required this.products,
+    required this.category,
   }) : super(key: key);
 
   @override
@@ -15,17 +16,35 @@ class ProductCarousel extends StatelessWidget {
     return Align(
       alignment: Alignment.topLeft,
       child: SizedBox(
-        height: 250,
-        child: ListView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.only(left: 20.0, top: 12.0, bottom: 25.0),
-          scrollDirection: Axis.horizontal,
-          itemCount: products.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: ProductCard(product: products[index]),
-            );
+        height: 220,
+        child: StreamBuilder(
+          stream: FirestoreServices.getProducts(category),
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            else if (snapshot.data!.docs.isEmpty) {
+              return const Center(
+                child: Text('No products found'),
+              );
+            }
+            else {
+              var data = snapshot.data!.docs;
+              return ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.only(left: 20.0, top: 12.0, bottom: 20.0),
+                scrollDirection: Axis.horizontal,
+                itemCount: data.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ProductCard(product: data[index], widthFactor: 3,),
+                  );
+                }
+              );
+            }
           }
         ),
       ),
