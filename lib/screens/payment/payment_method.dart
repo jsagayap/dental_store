@@ -30,6 +30,7 @@ class PaymentMethods extends StatelessWidget {
 
                   const orderPlaced = SnackBar(
                     content: Text('You got PayPal!'),
+                    behavior: SnackBarBehavior.floating,
                   );
                   ScaffoldMessenger.of(context).showSnackBar(orderPlaced);
                   Get.offAll(const HomeScreen());
@@ -42,6 +43,7 @@ class PaymentMethods extends StatelessWidget {
                   await controller.clearCart();
                   const orderPlaced = SnackBar(
                     content: Text('Your order has been successfully placed!'),
+                    behavior: SnackBarBehavior.floating,
                   );
                   // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(orderPlaced);

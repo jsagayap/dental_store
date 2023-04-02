@@ -27,7 +27,10 @@ class ShippingScreen extends StatelessWidget {
             Get.to(() => const PaymentMethods());
           }
           else {
-            const formIncom = SnackBar(content: Text('Please complete the form!'));
+            const formIncom = SnackBar(
+              content: Text('Please complete the form!'),
+              behavior: SnackBarBehavior.floating,
+            );
             ScaffoldMessenger.of(context).showSnackBar(formIncom);
           }
         },

@@ -35,6 +35,7 @@ class ProductScreen extends StatelessWidget {
           );
           const itemAdded = SnackBar(
             content: Text('Item successfully added to cart!'),
+            behavior: SnackBarBehavior.floating,
           );
           ScaffoldMessenger.of(context).showSnackBar(itemAdded);
         },
