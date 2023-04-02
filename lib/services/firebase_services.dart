@@ -7,15 +7,6 @@ class FirestoreServices {
     return firestore.collection(productsCollection).where('category', isEqualTo: category).snapshots();
   }
 
-  // Cart: Get total number of items in the cart
-  static getCartCount(uid) async {
-    var cartCount = await Future.wait([firestore.collection(cartCollection).where('userId', isEqualTo: uid).get().then((value) {
-        return value.docs.length;
-      })
-    ]);
-    return cartCount;
-  }
-
   // Cart: Retreive cart items based on user ID
   static getCart(uid) {
     return firestore.collection(cartCollection).where('userId', isEqualTo: uid).snapshots();

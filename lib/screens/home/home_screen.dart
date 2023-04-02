@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dental_store/widgets/widgets.dart';
 import 'package:dental_store/screens/screens.dart';
 import 'package:dental_store/controllers/home_controller.dart';
@@ -12,6 +13,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var controller = Get.put(HomeController());
+
     return Scaffold(
       appBar: const CustomAppBar(title: 'Dental Store', backButton: false),
       body: SingleChildScrollView(
@@ -74,46 +76,49 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FittedBox(
-        child: FutureBuilder(
-          // TODO: Change 1 to the logged user's ID
-          future: FirestoreServices.getCartCount(1),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            // var count = snapshot.data;
-
-            return Stack(
-              alignment: const Alignment(1.4, -1.5),
-              children: [
-                FloatingActionButton(  // Your actual Fab
-                  onPressed: () {
-                    Get.to(() => const CartScreen());
-                  },
-                  backgroundColor: const Color(0xFF51A8FF),
-                  child: const Icon(IconlyBroken.buy),
-                ),
-                // Container(
-                //   padding: const EdgeInsets.all(4),
-                //   constraints: const BoxConstraints(minHeight: 28, minWidth: 28),
-                //   decoration: BoxDecoration(
-                //     boxShadow: [
-                //       BoxShadow(
-                //         spreadRadius: 1,
-                //         blurRadius: 16,
-                //         color: Colors.black.withAlpha(50)
-                //       ),
-                //     ],
-                //     borderRadius: BorderRadius.circular(16),
-                //     color: Colors.red,
-                //   ),
-                //   child: Center(
-                //     child: Text(
-                //       count.toString(),
-                //       style: const TextStyle(color: Colors.white)
-                //     ),
-                //   ),
-                // ),
-              ],
-            );
-          },
+        child: Stack(
+          alignment: const Alignment(1.4, -1.5),
+          children: [
+            FloatingActionButton(  // Your actual Fab
+              onPressed: () {
+                Get.to(() => const CartScreen());
+              },
+              backgroundColor: const Color(0xFF51A8FF),
+              child: const Icon(IconlyBroken.buy),
+            ),
+            StreamBuilder(
+              // TODO: Change 1 to the logged user's ID
+              stream: FirestoreServices.getCart(1),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Container();
+                }
+                else {
+                  return Container(
+                    padding: const EdgeInsets.all(4),
+                    constraints: const BoxConstraints(minHeight: 28, minWidth: 28),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          spreadRadius: 1,
+                          blurRadius: 16,
+                          color: Colors.black.withAlpha(50)
+                        ),
+                      ],
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.red,
+                    ),
+                    child: Center(
+                      child: Text(
+                        snapshot.data!.docs.length.toString(),
+                        style: const TextStyle(color: Colors.white)
+                      ),
+                    ),
+                  );
+                }
+              }
+            ),
+          ],
         ),
       ),
     );
